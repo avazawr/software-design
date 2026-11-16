@@ -5,3 +5,4 @@ Dieses Repository enthält Übungsaufgaben aus dem Lernmodul **„Software Desig
 ## Challenges:
 
 - Software Design Paradigms
+- Software Design CS Fundamentals
