@@ -2,25 +2,24 @@ import { EditHistory } from "./edit-history";
 
 const history = new EditHistory("");
 
-const input = document.getElementById("text");
+function getElement<T extends HTMLElement>(id: string): T {
+  const element = document.getElementById(id);
 
-const undoBtn = document.getElementById("undo");
-const redoBtn = document.getElementById("redo");
+  if (!element) {
+    throw new Error(`Missing element: ${id}`);
+  }
 
-if (!(input instanceof HTMLInputElement)) {
-  throw new Error("Element #add-todo not found");
-}
-if (!(undoBtn instanceof HTMLButtonElement)) {
-  throw new Error("Element #add-todo not found");
-}
-if (!(redoBtn instanceof HTMLButtonElement)) {
-  throw new Error("Element #add-todo not found");
+  return element as T;
 }
 
-function updateButtons(
-  undoBtn: HTMLButtonElement,
-  redoBtn: HTMLButtonElement,
-): void {
+const input = getElement<HTMLInputElement>("text");
+
+const undoBtn = getElement<HTMLButtonElement>("undo");
+const redoBtn = getElement<HTMLButtonElement>("redo");
+
+updateButtons();
+
+function updateButtons(): void {
   undoBtn.disabled = !history.canUndo;
   redoBtn.disabled = !history.canRedo;
 }
@@ -29,7 +28,7 @@ input.addEventListener("input", (event) => {
   const text = input.value;
   if (text) {
     history.record(text);
-    updateButtons(undoBtn, redoBtn);
+    updateButtons();
   }
 });
 
@@ -38,7 +37,7 @@ undoBtn.addEventListener("click", (event) => {
   if (history.canUndo) {
     history.undo();
     input.value = history.current;
-    updateButtons(undoBtn, redoBtn);
+    updateButtons();
   }
 });
 
@@ -47,8 +46,6 @@ redoBtn.addEventListener("click", (event) => {
   if (history.canRedo) {
     history.redo();
     input.value = history.current;
-    updateButtons(undoBtn, redoBtn);
+    updateButtons();
   }
 });
-
-updateButtons(undoBtn, redoBtn);
