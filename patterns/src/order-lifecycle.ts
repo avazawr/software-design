@@ -20,6 +20,8 @@ const transitions: Record<
   AwaitingPayment: { payment_received: "Paid", cancel: "Cancelled" },
   Paid: { dispatch: "Shipped", cancel: "Cancelled" },
   Shipped: { confirm_delivery: "Delivered" },
+  Cancelled: {},
+  Delivered: {},
 };
 
 // decorator returns a function
