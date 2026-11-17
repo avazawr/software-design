@@ -43,10 +43,6 @@ class RequestBuilder {
     return this;
   }
   build(): HttpRequest {
-    // const { minDuration, maxDuration } = this.filters;
-    // if (minDuration !== undefined && maxDuration !== undefined && minDuration > maxDuration) {
-    //     throw new Error("Invalid duration range");
-    // }
     const { method, url, body } = this.httpRequest;
 
     if (!method || !url) {
@@ -93,3 +89,6 @@ const req3 = new RequestBuilder()
   .withMethod("POST")
   .withJsonBody({ id: "345" })
   .build();
+
+//req3.method = "DELETE";
+//Cannot assign to 'method' because it is a read-only property.
