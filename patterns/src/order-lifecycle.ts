@@ -22,6 +22,18 @@ const transitions: Record<
   Shipped: { confirm_delivery: "Delivered" },
 };
 
+// decorator returns a function
+function log_in_console(
+  originalMethod: any,
+  context: ClassMethodDecoratorContext,
+) {
+  return function (this: any, ...args: any[]) {
+    const result = originalMethod.call(this, ...args); // decorator function is responsible to call the original method
+    console.log(this.showState);
+    return result;
+  };
+}
+
 class Order {
   constructor(public name: string) {}
 
@@ -34,25 +46,25 @@ class Order {
     this.state = next;
   }
 
+  @log_in_console
   checkout() {
     this.transition("checkout");
-    console.log(this.showState);
   }
+  @log_in_console
   payment_received() {
     this.transition("payment_received");
-    console.log(this.showState);
   }
+  @log_in_console
   dispatch() {
     this.transition("dispatch");
-    console.log(this.showState);
   }
+  @log_in_console
   confirm_delivery() {
     this.transition("confirm_delivery");
-    console.log(this.showState);
   }
+  @log_in_console
   cancel() {
     this.transition("cancel");
-    console.log(this.showState);
   }
 
   get showState(): String {
