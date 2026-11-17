@@ -36,8 +36,37 @@ function log_in_console(
   };
 }
 
+interface Listener {
+  onOrderStatusChange: OrderEvent;
+}
+class Warehouse implements Listener {
+  onOrderStatusChange(id: string, from: OrderState, to: OrderState) {
+    if (to === "Paid") console.log(`Warehouse detected that ${id} paid!`);
+  }
+}
+class Email implements Listener {
+  onOrderStatusChange(id: string, from: OrderState, to: OrderState) {
+    if (to === "Shipped") console.log(`Email: ${id} is shipped!`);
+  }
+}
+
+// Observer ------
+type OrderEvent = (id: string, from: OrderState, to: OrderState) => void;
+
 class Order {
   constructor(public name: string) {}
+
+  private listeners: Listener[] = [];
+
+  subscribe(listener: Listener) {
+    this.listeners.push(listener);
+  }
+
+  emit(name: string, from: OrderState, to: OrderState) {
+    for (const listener of this.listeners) {
+      listener.onOrderStatusChange(name, from, to);
+    }
+  }
 
   private state: OrderState = "Draft";
 
@@ -45,7 +74,11 @@ class Order {
     const next = transitions[this.state][action];
     if (!next)
       throw new Error(`Illegal transition: ${action} from ${this.state}`);
+
+    const oldstate = this.state;
     this.state = next;
+
+    this.emit(this.name, oldstate, next);
   }
 
   @log_in_console
@@ -74,7 +107,14 @@ class Order {
   }
 }
 
+// -----GAME----------------------------------------------------------
+
+const warehouse = new Warehouse();
+const email = new Email();
+
 const order = new Order("Order #1");
+order.subscribe(warehouse);
+order.subscribe(email);
 
 console.log(order.showState);
 order.checkout();
@@ -83,6 +123,8 @@ order.dispatch();
 order.confirm_delivery();
 
 const order2 = new Order("Order #2");
+order2.subscribe(warehouse);
+order2.subscribe(email);
 
 console.log(order2.showState);
 order2.checkout();
@@ -90,6 +132,9 @@ order2.payment_received();
 order2.cancel();
 
 const order3 = new Order("Order #3");
+order3.subscribe(email);
+order3.subscribe(warehouse);
+
 order3.checkout();
 try {
   order3.dispatch();
